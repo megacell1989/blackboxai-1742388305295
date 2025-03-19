@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # Backend API service - Development overrides
+  api:
+    build:
+      target: builder # Use the builder stage from Dockerfile
+    environment:
+      - NODE_ENV=development
+      - DEBUG=pos:*
+      - LOG_LEVEL=debug
+    volumes:
+      - ./backend:/app/backend:delegated # Mount source code for hot reloading
+      - /app/backend/node_modules # Preserve container node_modules
+    command: npm run dev # Use nodemon for development
+    ports:
+      - "9229:9229" # Enable debugging port
+
+  # PostgreSQL - Development overrides
+  postgres:
+    ports:
+      - "5432:5432" # Expose port for local development tools
+    environment:
+      - POSTGRES_DB=pos_system_dev
+    volumes:
+      - ./scripts/init-dev-db.sql:/docker-entrypoint-initdb.d/init.sql:ro # Initialize with dev data
+
+  # Redis - Development overrides
+  redis:
+    ports:
+      - "6379:6379" # Expose port for local development tools
+    command: redis-server --appendonly yes --requirepass "" # Disable password in development
+
+  # pgAdmin - Development overrides
+  pgadmin:
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+    volumes:
+      - ./scripts/pgadmin-servers.json:/pgadmin4/servers.json:ro # Pre-configure servers
+
+  # Development-only services
+  mailhog:
+    image: mailhog/mailhog
+    container_name: pos_mailhog
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web interface port
+    networks:
+      - pos_network
+
+  # Adminer - Alternative to pgAdmin
+  adminer:
+    image: adminer
+    container_name: pos_adminer
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+      - ADMINER_DESIGN=dracula # Use dark theme
+    networks:
+      - pos_network
+
+  # Redis Commander - Redis GUI
+  redis-commander:
+    image: rediscommander/redis-commander
+    container_name: pos_redis_commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=redis:redis:6379
+    networks:
+      - pos_network
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  pos_network:
+    driver: bridge
+
+# Development-specific settings
+x-development:
+  api:
+    # VSCode debugger configuration
+    environment:
+      - NODE_OPTIONS=--inspect=0.0.0.0:9229
+    # Enable source maps
+    command: >
+      sh -c "npm install -g nodemon &&
+             nodemon --inspect=0.0.0.0:9229 backend/server.js"
+    # Mount VSCode debugger configuration
+    volumes:
+      - ./.vscode:/app/.vscode:ro
