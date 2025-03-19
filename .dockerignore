@@ -1,0 +1,111 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+out/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+
+# Temporary files
+tmp/
+temp/
+uploads/*
+!uploads/.gitkeep
+
+# Database files
+*.sqlite
+*.sqlite3
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Development tools
+.eslintrc*
+.prettierrc*
+.editorconfig
+.travis.yml
+.circleci/
+.github/
+jest.config.js
+*.test.js
+*.spec.js
+__tests__/
+__mocks__/
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Cache directories
+.cache/
+.npm/
+.yarn/
+
+# Miscellaneous
+*.csv
+*.dat
+*.gz
+*.tar
+*.zip
+*.rar
+*.7z
+
+# Project specific
+scripts/
+Makefile
+*.sh
+*.sql
+
+# Keep necessary files
+!.env.example
+!README.md
+!CONTRIBUTING.md
+!LICENSE
